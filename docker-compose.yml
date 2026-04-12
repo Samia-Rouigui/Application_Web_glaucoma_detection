@@ -16,14 +16,15 @@ services:
     build: ./backend/uploads
     ports:
       - "8000:8000"
+    env_file:
+      - ./backend/uploads/.env        # charge JWT_SECRET, OPENAI_API_KEY, etc.
     environment:
+      # Override DL_SERVICE_URL : dans Docker le service s'appelle "dl_api", pas "localhost"
       - DL_SERVICE_URL=http://dl_api:8001/analyze/
-      - JWT_SECRET=dev_secret_change_in_prod
-      - OPENAI_API_KEY=${OPENAI_API_KEY} # Pass through from host
+      # Override CORS pour exposer depuis le container frontend
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173
     volumes:
-      - ./backend/uploads:/app
-      - ./backend/uploads/auth.db:/app/auth.db # Persist DB
-      - ./backend/uploads/uploaded_images:/app/uploaded_images # Persist images
+      - ./backend/uploads:/app  # auth.db et uploaded_images sont dans ce répertoire, pas besoin de mounts séparés
     networks:
       - glaucoma_net
     depends_on:

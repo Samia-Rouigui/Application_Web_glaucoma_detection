@@ -64,19 +64,26 @@ def load_model_weights(model_path, device='cpu'):
 class GradCAM:
     def __init__(self, model):
         self.model = model
-        self.feature_extractor = model[0]  
+        self.feature_extractor = model[0]
         self.target_layer = self.feature_extractor[-3]
         self.gradients = None
         self.activations = None
-        self.target_layer.register_forward_hook(self.save_activation)
-        self.target_layer.register_full_backward_hook(self.save_gradient)
-    
+        self._hooks = [
+            self.target_layer.register_forward_hook(self.save_activation),
+            self.target_layer.register_full_backward_hook(self.save_gradient),
+        ]
+
     def save_activation(self, module, input, output):
         self.activations = output
-    
+
     def save_gradient(self, module, grad_input, grad_output):
         self.gradients = grad_output[0]
-    
+
+    def remove_hooks(self):
+        for h in self._hooks:
+            h.remove()
+        self._hooks = []
+
     def __call__(self, x, class_idx=None):
         self.model.eval()
         output = self.model(x)
@@ -97,18 +104,25 @@ class GradCAMPlusPlus:
     def __init__(self, model):
         self.model = model
         self.feature_extractor = model[0]
-        self.target_layer = self.feature_extractor[-3] 
+        self.target_layer = self.feature_extractor[-3]
         self.gradients = None
         self.activations = None
-        self.target_layer.register_forward_hook(self.save_activation)
-        self.target_layer.register_full_backward_hook(self.save_gradient)
-    
+        self._hooks = [
+            self.target_layer.register_forward_hook(self.save_activation),
+            self.target_layer.register_full_backward_hook(self.save_gradient),
+        ]
+
     def save_gradient(self, module, grad_input, grad_output):
         self.gradients = grad_output[0]
-    
+
     def save_activation(self, module, input, output):
         self.activations = output
-    
+
+    def remove_hooks(self):
+        for h in self._hooks:
+            h.remove()
+        self._hooks = []
+
     def __call__(self, x, class_idx=None):
         self.model.eval()
         output = self.model(x)

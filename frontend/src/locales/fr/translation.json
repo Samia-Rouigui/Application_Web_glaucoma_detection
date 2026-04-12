@@ -135,7 +135,8 @@
         "msg_healthy": "Rétine saine",
         "reco_pressure": "Contrôle pression intraoculaire",
         "reco_normal": "Fond d'œil normal",
-        "reco_standard": "Surveillance standard"
+        "reco_standard": "Surveillance standard",
+        "disclaimer": "Outil d'aide à la décision médicale uniquement. Ce résultat ne remplace pas le diagnostic d'un médecin ophtalmologue qualifié."
 },
     "viewer": {
     "badge": "Topographie 3D",

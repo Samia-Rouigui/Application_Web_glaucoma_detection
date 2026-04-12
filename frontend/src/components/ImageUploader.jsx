@@ -254,6 +254,12 @@ const GlaucomaDetectionApp = () => {
           /* --- PARTIE 2 : RÉSULTATS --- */
           <div className="bg-slate-50 min-h-screen flex flex-col">
 
+            {/* Disclaimer médical */}
+            <div className="bg-amber-50 border-b border-amber-200 px-6 py-2 flex items-center gap-2 text-amber-800 text-xs font-medium">
+              <AlertTriangle size={14} className="shrink-0" />
+              {t('upload.disclaimer')}
+            </div>
+
             {/* Header Resultats */}
             <div className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm z-10">
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">

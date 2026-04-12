@@ -135,7 +135,8 @@
         "msg_healthy": "Healthy retina",
         "reco_pressure": "Check intraocular pressure",
         "reco_normal": "Normal fundus",
-        "reco_standard": "Standard monitoring"
+        "reco_standard": "Standard monitoring",
+        "disclaimer": "Decision support tool only. This result does not replace the diagnosis of a qualified ophthalmologist."
     },
     "viewer": {
         "badge": "3D Topography",

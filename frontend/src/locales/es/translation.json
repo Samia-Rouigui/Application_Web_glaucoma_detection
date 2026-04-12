@@ -135,7 +135,8 @@
         "msg_healthy": "Retina sana",
         "reco_pressure": "Control de presión intraocular",
         "reco_normal": "Fondo de ojo normal",
-        "reco_standard": "Vigilancia estándar"
+        "reco_standard": "Vigilancia estándar",
+        "disclaimer": "Herramienta de apoyo a la decisión médica únicamente. Este resultado no reemplaza el diagnóstico de un oftalmólogo cualificado."
     },
     "viewer": {
         "badge": "Topografía 3D",

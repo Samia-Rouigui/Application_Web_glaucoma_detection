@@ -61,38 +61,39 @@ def generate_gradcam_base64(model, image_tensor):
     """
     gradcam = GradCAM(model)
     gradcam_pp = GradCAMPlusPlus(model)
-    
-    gradcam_map = gradcam(image_tensor)
-    gradcam_pp_map = gradcam_pp(image_tensor)
-    
+
+    try:
+        gradcam_map = gradcam(image_tensor)
+        gradcam_pp_map = gradcam_pp(image_tensor)
+    finally:
+        gradcam.remove_hooks()
+        gradcam_pp.remove_hooks()
+
     image = image_tensor.squeeze().cpu().numpy().transpose(1, 2, 0)
     image = (image - image.min()) / (image.max() - image.min())
-    
-    # Création du plot Matplotlib
+
     fig = plt.figure(figsize=(10, 6))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])  
-    
+    gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
+
     ax0 = plt.subplot(gs[0, 0])
     ax0.imshow(image)
-    ax0.imshow(cv2.resize(gradcam_map[0], (image.shape[1], image.shape[0])), 
-           cmap='jet', alpha=0.5)
+    ax0.imshow(cv2.resize(gradcam_map[0], (image.shape[1], image.shape[0])),
+               cmap='jet', alpha=0.5)
     ax0.set_title('GradCAM')
     ax0.axis('off')
 
     ax1 = plt.subplot(gs[0, 1])
     ax1.imshow(image)
-    ax1.imshow(cv2.resize(gradcam_pp_map, (image.shape[1], image.shape[0])), 
-           cmap='jet', alpha=0.5)
+    ax1.imshow(cv2.resize(gradcam_pp_map, (image.shape[1], image.shape[0])),
+               cmap='jet', alpha=0.5)
     ax1.set_title('GradCAM++')
     ax1.axis('off')
 
-    # Sauvegarde dans un buffer mémoire au lieu d'un fichier
     buf = io.BytesIO()
     plt.savefig(buf, format='png', bbox_inches='tight')
-    plt.close(fig) # Important pour libérer la mémoire
+    plt.close(fig)
     buf.seek(0)
-    
-    # Encodage en Base64
+
     img_str = base64.b64encode(buf.read()).decode('utf-8')
     return f"data:image/png;base64,{img_str}"
 
@@ -105,8 +106,12 @@ def generate_gradcam_png_bytes(model, image_tensor):
     gradcam = GradCAM(model)
     gradcam_pp = GradCAMPlusPlus(model)
 
-    gradcam_map = gradcam(image_tensor)
-    gradcam_pp_map = gradcam_pp(image_tensor)
+    try:
+        gradcam_map = gradcam(image_tensor)
+        gradcam_pp_map = gradcam_pp(image_tensor)
+    finally:
+        gradcam.remove_hooks()
+        gradcam_pp.remove_hooks()
 
     image = image_tensor.squeeze().cpu().numpy().transpose(1, 2, 0)
     image = (image - image.min()) / (image.max() - image.min())

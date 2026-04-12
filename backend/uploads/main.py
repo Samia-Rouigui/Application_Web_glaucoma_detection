@@ -1,6 +1,8 @@
 # backend/uploads/main.py
 import base64
 import os
+from dotenv import load_dotenv
+load_dotenv()  # charge backend/uploads/.env en développement local
 import shutil
 import asyncio
 import json
@@ -9,7 +11,6 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 
 import httpx
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, status, Form, Header, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +33,9 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 TTL_MINUTES = 4320
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("La variable d'environnement OPENAI_API_KEY est manquante. Créez un fichier .env (voir .env.example).")
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
 DATABASE_URL = "sqlite:///./auth.db"
@@ -263,21 +266,14 @@ async def lifespan(app: FastAPI):
 # --- APP ---
 app = FastAPI(lifespan=lifespan)
 
-# Middleware pour CORS
-class ForceCorsMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        response = await call_next(request)
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
+CORS_ORIGINS = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5173,http://localhost:3000"
+).split(",")
 
-app.add_middleware(ForceCorsMiddleware)
-
-origins = ["http://localhost:5173", "http://localhost:3000"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
